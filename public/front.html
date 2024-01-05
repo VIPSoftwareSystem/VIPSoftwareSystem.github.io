@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glasgow Plate Dictionary</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 15px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #logo {
+            text-align: center;
+        }
+
+        #logout-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 80vh;
+        }
+
+        #search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #ccc;
+            border-radius: 25px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 60%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+
+        #search-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 50px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        #search-input:hover {
+            cursor: text;
+        }
+
+        #search-icon {
+            cursor: pointer;
+            align-items: inline;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        #overlay-content {
+            background-color: #ffffff98;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            align-items: center;
+        }
+
+        #close-modal-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .plate-details-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .plate-details-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .plate-details-container h2 {
+            margin-bottom: 10px;
+        }
+
+        .plate-details-container p {
+            margin-bottom: 8px;
+        }
+
+        #plates-menu-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #plates-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #plates-menu li {
+            cursor: pointer;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+
+        #plates-menu li:hover {
+            background-color: #ccc;
+        }
+
+        #license-plate {
+            text-transform: uppercase !important;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #grades {
+            padding: 10px;
+        }
+
+        #add-plate-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        #add-plate-form label {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        #add-plate-form input,
+        #add-plate-form select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #add-plate-form select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: url('path/to/your-arrow-icon.png') no-repeat right center;
+            background-size: 20px;
+        }
+
+        #add-plate-form button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #add-plate-form button:hover {
+            background-color: #45a049;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav li {
+            margin-right: 20px; /* Add space between navbar items */
+        }
+
+        #view-all-btn {
+            color: rgb(0, 0, 0);
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgb(0, 0, 0);
+        }
+
+        #view-all-btn:hover {
+            background-color: #45a049;
+        }
+
+        #add-new-btn {
+            color: rgb(0, 0, 0);
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        #add-new-btn:hover {
+            background-color: #45a049;
+        }
+
+        #add-new-btn {
+            display: inline-block;
+            font-weight: 400;
+            color: #212529;
+            text-align: center;
+            border: 1px solid transparent;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: .25rem;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none; /* Remove underline */
+            list-style: none; /* Remove bullet point */
+            transition: background-color 0.3s ease; /* Add smooth transition */
+        }
+
+        #view-all-btn {
+            display: inline-block;
+            font-weight: 400;
+            color: #212529;
+            text-align: center;
+            border: 1px solid transparent;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: .25rem;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none; /* Remove underline */
+            list-style: none; /* Remove bullet point */
+            transition: background-color 0.3s ease; /* Add smooth transition */
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#" id="view-all-btn">View All Plates</a></li>
+                <li><a href="#" id="add-new-btn">Add New Plate</a></li>
+            </ul>
+        </nav>
+
+        <div id="user-info"></div>
+        <button id="logout-btn">LOGOUT</button>
+    </header>
+
+    <main>
+        <div id="logo">
+            <img src="images/logo.png" width="200" height="200" alt="Glasgow Logo">
+            <h1>Glasgow Plate Dictionary</h1>
+        </div>
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Licence Plate">
+        </div>
+
+        <!-- Add this line to front.html where you have the search button -->
+        <div id="search-icon" onclick="searchPlates()">🔍</div>
+
+        <!-- Add this to your front.html file where you want the overlay to appear -->
+        <div id="overlay">
+            <div id="overlay-content">
+                <!-- X button to close the overlay -->
+                <span id="close-modal-btn" onclick="closeAddPlateForm()">&times;</span>
+
+                <!-- Form for adding a new plate -->
+                <form id="add-plate-form">
+                    <label for="license-plate">License Plate:</label>
+                    <input type="text" id="license-plate" name="licensePlate" required>
+
+                    <label for="variant">Variant:</label>
+                    <input type="number" id="variant" name="variant" min="0" max="2" required>
+
+                    <label for="issued-date">Issued Date:</label>
+                    <input type="date" id="issued-date" name="issuedDate" required>
+
+                    <label for="recorded-date">Recorded Date:</label>
+                    <input type="date" id="recorded-date" name="recordedDate" required>
+
+                    <label for="passengers">Passengers:</label>
+                    <input type="number" id="passengers" name="passengers" min="1" max="10" required>
+
+                    <label for="grade">Grade:</label>
+                    <select name="grade" id="grades">
+                        <option value="Pristine">Pristine</option>
+                        <option value="Good">Good</option>
+                        <option value="Used">Used</option>
+                        <option value="Well Worn">Well Worn</option>
+                        <option value="Non-Eligible">Non-Eligible</option>
+                    </select>
+
+                    <button type="submit">Add Plate</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Overlay for displaying plate details -->
+        <div class="plate-details-overlay" id="plate-details-overlay">
+            <div class="plate-details-container" id="plate-details-container">
+                <h2 id="plate-details-title"></h2>
+                <p id="plate-details-variant"></p>
+                <p id="plate-details-issued-date"></p>
+                <p id="plate-details-recorded-date"></p>
+                <p id="plate-details-passengers"></p>
+                <p id="plate-details-grade"></p>
+                <button id="close-details-btn">Close</button>
+            </div>
+        </div>
+
+        <!-- Container to display plates in a menu system -->
+        <div id="plates-menu-container">
+            <h2>All Plates</h2>
+            <ul id="plates-menu"></ul>
+        </div>
+    </main>
+
+    <!-- Overlay for displaying search results -->
+    <div id="search-result" class="plate-details-overlay">
+        <div class="plate-details-container">
+            <h2>Search Result</h2>
+            <p id="search-result-message"></p>
+            <div id="search-result-details"></div>
+            <button id="close-search-result-btn">Close</button>
+        </div>
+    </div>
+
+    <script src="scriptfront.js"></script>
+</body>
+
+</html>
