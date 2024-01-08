@@ -10,11 +10,11 @@ const db = new sqlite3.Database('platesDB.db');
 router.use(bodyParser.json());
 
 router.post('/add-plate', (req, res) => {
-    const { licensePlate, variant, issuedDate, recordedDate, passengers, grade } = req.body;
+    const { licensePlate, variant, issuedDate, recordedDate, passengers, grade, backPlate, frontPlate, notes } = req.body;
 
     db.run(
-        'INSERT INTO platesDB (LicensePlate, Variant, IssuedDate, RecordedDate, Passengers, Grade) VALUES (?, ?, ?, ?, ?, ?)',
-        [licensePlate, variant, issuedDate, recordedDate, passengers, grade],
+        'INSERT INTO platesDB (LicensePlate, Variant, IssuedDate, RecordedDate, Passengers, Grade, BackPlate, FrontPlate, Notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [licensePlate, variant, issuedDate, recordedDate, passengers, grade, backPlate, frontPlate, notes],
         (err) => {
             if (err) {
                 console.error('Error adding plate:', err);
@@ -26,7 +26,9 @@ router.post('/add-plate', (req, res) => {
     );
 });
 
-// Modify the response for the /view-all-plates route
+
+// platesDBController.js
+
 router.get('/view-all-plates', (req, res) => {
     db.all('SELECT * FROM platesDB', (err, rows) => {
         if (err) {
@@ -37,6 +39,7 @@ router.get('/view-all-plates', (req, res) => {
         res.json({ plates: rows }); // Wrap the array of plates in an object
     });
 });
+
 
 router.get('/search-plate', (req, res) => {
     const searchTerm = req.query.search;

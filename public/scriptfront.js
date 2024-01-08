@@ -80,29 +80,32 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.style.display = 'block';
         });
 
-        addPlateForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+// scriptfront.js
 
-            const formData = new FormData(addPlateForm);
-            const plateData = {};
-            formData.forEach((value, key) => {
-                plateData[key] = value;
-            });
+    addPlateForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-            const response = await fetch('/add-plate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(plateData),
-            });
-
-            if (response.ok) {
-                overlay.style.display = 'none';
-            } else {
-                console.error('Error adding plate:', response.statusText);
-            }
+        const formData = new FormData(addPlateForm);
+        const plateData = {};
+        formData.forEach((value, key) => {
+            plateData[key] = value;
         });
+
+        const response = await fetch('/add-plate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(plateData),
+        });
+
+        if (response.ok) {
+            overlay.style.display = 'none';
+        } else {
+            console.error('Error adding plate:', response.statusText);
+        }
+    });
+
 
         async function searchPlates() {
             const searchTerm = searchInput.value.trim();
