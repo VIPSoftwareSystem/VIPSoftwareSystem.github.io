@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/logout', { method: 'POST' });
 
             if (response.ok) {
-                window.location.href = 'index.html';
+                window.location.href = 'public/index.html';
             } else {
                 console.error('Error during logout:', response.statusText);
             }
@@ -82,29 +82,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // scriptfront.js
 
-    addPlateForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+addPlateForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-        const formData = new FormData(addPlateForm);
-        const plateData = {};
-        formData.forEach((value, key) => {
+    const formData = new FormData(addPlateForm);
+    const plateData = {};
+
+    // Extract selected radio button value for plateType
+    const selectedPlateType = formData.get('plateType');
+    plateData['plateType'] = selectedPlateType;
+
+    // Extract other form fields
+    formData.forEach((value, key) => {
+        if (key !== 'plateType') {
             plateData[key] = value;
-        });
-
-        const response = await fetch('/add-plate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(plateData),
-        });
-
-        if (response.ok) {
-            overlay.style.display = 'none';
-        } else {
-            console.error('Error adding plate:', response.statusText);
         }
     });
+
+    const response = await fetch('/add-plate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(plateData),
+    });
+
+    if (response.ok) {
+        overlay.style.display = 'none';
+    } else {
+        console.error('Error adding plate:', response.statusText);
+    }
+});
 
 
         async function searchPlates() {
@@ -149,35 +157,41 @@ document.addEventListener('DOMContentLoaded', () => {
             searchResult.style.display = 'flex';
         }
 
-        function displayPlatesMenu(plates) {
+        function displayPlatesMenu(platesData) {
             const platesMenu = document.getElementById('plates-menu');
-
+        
+            plates = platesData; // Update the plates array
+        
             platesMenu.innerHTML = '';
-
+        
             plates.forEach((plate) => {
                 const plateItem = document.createElement('li');
                 plateItem.textContent = plate.LicensePlate;
-
+        
                 plateItem.addEventListener('click', () => {
                     showPlateDetails(plate);
                 });
-
+        
                 platesMenu.appendChild(plateItem);
             });
-
+        
             platesMenuContainer.style.display = 'block';
         }
+        
 
         function showPlateDetails(plate) {
             const plateDetailsOverlay = document.getElementById('plate-details-overlay');
             const plateDetailsContainer = document.getElementById('plate-details-container');
 
-            document.getElementById('plate-details-title').textContent = `License Plate: ${plate.LicensePlate}`;
-            document.getElementById('plate-details-variant').textContent = `Variant: ${plate.Variant}`;
-            document.getElementById('plate-details-issued-date').textContent = `Issued Date: ${plate.IssuedDate}`;
-            document.getElementById('plate-details-recorded-date').textContent = `Recorded Date: ${plate.RecordedDate}`;
-            document.getElementById('plate-details-passengers').textContent = `Passengers: ${plate.Passengers}`;
-            document.getElementById('plate-details-grade').textContent = `Grade: ${plate.Grade}`;
+            document.getElementById('plate-details-title').innerHTML = `<b>License Plate:</b> ${plate.LicensePlate}`;
+            document.getElementById('plate-details-variant').innerHTML = `<b>Variant:</b> ${plate.Variant}`;
+            document.getElementById('plate-details-issued-date').innerHTML = `<b>Issued Date:</b> ${plate.IssuedDate}`;
+            document.getElementById('plate-details-recorded-date').innerHTML = `<b>Recorded Date:</b> ${plate.RecordedDate}`;
+            document.getElementById('plate-details-passengers').innerHTML = `<b>Passengers:</b> ${plate.Passengers}`;
+            document.getElementById('plate-details-grade').innerHTML = `<b>Grade:</b> ${plate.Grade}`;
+            document.getElementById('plate-details-plate-type').innerHTML = `<b>Plate Type:</b> ${plate.plateType || 'N/A'}`;            
+            document.getElementById('plate-details-notes').innerHTML = `<br><b>Notes</b> <br>${plate.notes || 'N/A'}`;
+
 
             plateDetailsOverlay.style.display = 'flex';
 

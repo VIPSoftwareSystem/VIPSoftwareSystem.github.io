@@ -256,6 +256,13 @@
             list-style: none;
             transition: background-color 0.3s ease;
         }
+
+        #plate-details-notes{
+            text-align: center;
+
+        }
+
+
     </style>
 </head>
 
@@ -294,22 +301,22 @@
 
                 <!-- Form for adding a new plate -->
                 <form id="add-plate-form">
-                    <label for="license-plate">License Plate:</label>
+                    <label for="license-plate"><b>License Plate:</b></label>
                     <input type="text" id="license-plate" name="licensePlate" required>
 
-                    <label for="variant">Variant:</label>
+                    <label for="variant"><b>Variant:</b></label>
                     <input type="number" id="variant" name="variant" min="0" max="2" required>
 
-                    <label for="issued-date">Issued Date:</label>
+                    <label for="issued-date"><b>Issued Date:</b></label>
                     <input type="date" id="issued-date" name="issuedDate" required>
 
-                    <label for="recorded-date">Recorded Date:</label>
+                    <label for="recorded-date"><b>Recorded Date:</b></label>
                     <input type="date" id="recorded-date" name="recordedDate" required>
 
-                    <label for="passengers">Passengers:</label>
+                    <label for="passengers"><b>Passengers:</b></label>
                     <input type="number" id="passengers" name="passengers" min="1" max="10" required>
 
-                    <label for="grade">Grade:</label>
+                    <label for="grade"><b>Grade:</b></label>
                     <select name="grade" id="grades">
                         <option value="Pristine">Pristine</option>
                         <option value="Good">Good</option>
@@ -318,22 +325,23 @@
                         <option value="Non-Eligible">Non-Eligible</option>
                     </select>
 
-
+                    <label for="plate-type"><b>Plate Type</b></label>
 
                     <label for="back-plate">Back Plate</label>
-                    <input type="radio" id="back-plate" name="platePosition" value="Back">
+                    <input type="radio" id="back-plate" name="plateType" value="Back">
+
 
                     <label for="front-plate">Front Plate</label>
-                    <input type="radio" id="front-plate" name="platePosition" value="Front">
+                    <input type="radio" id="front-plate" name="plateType" value="Front">
+
 
                     <label for="both-plates">Both Plates</label>
-                    <input type="radio" id="both-plates" name="platePosition" value="Both">
-                    
-                    <label for="na-plate">N/A</label>
-                    <input type="radio" id="na-plate" name="platePosition" value="N/A">
-                    
+                    <input type="radio" id="both-plates" name="plateType" value="Both">
 
-                    <label for="notes">Notes:</label>
+                    <label for="na-plate">N/A</label>
+                    <input type="radio" id="na-plate" name="plateType" value="N/A">
+
+                    <label for="notes"><b>Notes:</b></label>
                     <textarea id="notes" name="notes" rows="4" cols="50"></textarea>
 
                     <button type="submit">Add Plate</button>
@@ -350,6 +358,8 @@
                 <p id="plate-details-recorded-date"></p>
                 <p id="plate-details-passengers"></p>
                 <p id="plate-details-grade"></p>
+                <p id="plate-details-plate-type"></p> <!-- Add this line -->
+                <p id="plate-details-notes"></p> <!-- Add this line -->
                 <button id="close-details-btn">Close</button>
             </div>
         </div>

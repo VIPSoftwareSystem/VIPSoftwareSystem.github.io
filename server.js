@@ -98,6 +98,6 @@ app.post('/logout', (req, res) => {
 app.use('/', platesDBController);
 
 // Start the server
-app.listen(PORT, () => {
+app.listen(PORT, '192.168.0.71', () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

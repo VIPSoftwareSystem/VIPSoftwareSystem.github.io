@@ -10,15 +10,15 @@ const db = new sqlite3.Database('platesDB.db');
 router.use(bodyParser.json());
 
 router.post('/add-plate', (req, res) => {
-    const { licensePlate, variant, issuedDate, recordedDate, passengers, grade, backPlate, frontPlate, notes } = req.body;
+    const { licensePlate, variant, issuedDate, recordedDate, passengers, grade, plateType, notes } = req.body;
 
     db.run(
-        'INSERT INTO platesDB (LicensePlate, Variant, IssuedDate, RecordedDate, Passengers, Grade, BackPlate, FrontPlate, Notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [licensePlate, variant, issuedDate, recordedDate, passengers, grade, backPlate, frontPlate, notes],
+        'INSERT INTO platesDB (LicensePlate, Variant, IssuedDate, RecordedDate, Passengers, Grade, plateType, Notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [licensePlate, variant, issuedDate, recordedDate, passengers, grade, plateType, notes],
         (err) => {
             if (err) {
                 console.error('Error adding plate:', err);
-                return res.status(500).json({ error: 'Internal server error.' });
+                return res.status(500).json({ error: 'Internal server error.', details: err.message });
             }
 
             res.json({ message: 'Plate added successfully.' });
