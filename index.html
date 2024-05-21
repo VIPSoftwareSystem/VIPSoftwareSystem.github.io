@@ -3,6 +3,10 @@
 <head>
   <title>Speech Recognition</title>
   <style>
+    .body {
+
+    }
+
     #result {
       margin-top: 20px;
       width: 400px;
@@ -23,22 +27,18 @@
     const resultDiv = document.getElementById('result');
     let isListening = false;
 
-    // Check if speech recognition is supported in the browser
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
 
-    // Configure the recognition settings
     recognition.continuous = true;
     recognition.interimResults = true;
 
     toggleButton.addEventListener('click', () => {
       if (!isListening) {
-        // Start listening when the button is clicked
         recognition.start();
         isListening = true;
         toggleButton.textContent = 'Stop Microphone';
       } else {
-        // Stop listening when the button is clicked again
         recognition.stop();
         isListening = false;
         toggleButton.textContent = 'Start Microphone';
@@ -49,12 +49,10 @@
       const transcript = event.results[event.results.length - 1][0].transcript;
       resultDiv.textContent = transcript;
 
-      // Extract values using regular expressions
       const plateNumber = getMatch(transcript, /Plate number (\d+)/i);
       const passengers = getMatch(transcript, /Passengers (\d+)/i);
       const type = getMatch(transcript, /Type (.+)/i);
 
-      // Save the variables or do further processing
       console.log('Plate number:', plateNumber);
       console.log('Passengers:', passengers);
       console.log('Type:', type);
