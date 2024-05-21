@@ -1,91 +1,69 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Speech Recognition</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        .form-container {
-            display: none;
-            margin-top: 20px;
-        }
-        #speechButton {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-        }
-        #speechButton.active {
-            background-color: #f44336;
-        }
-        #spokenText {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
+  <title>Speech Recognition</title>
+  <style>
+    #result {
+      margin-top: 20px;
+      width: 400px;
+      height: 100px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: auto;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Speak Vehicle Information</h1>
-        <button id="speechButton" ontouchstart="startSpeech()" ontouchend="stopSpeech()" onclick="toggleSpeech()">Start Speaking</button>
-        <div id="spokenText"></div>
-        <div class="form-container">
-            <form id="speechForm" method="POST" action="/process_speech">
-                <input type="hidden" name="speechInput" id="speechInput">
-                <button type="submit">Save Information</button>
-            </form>
-        </div>
-    </div>
+  <h1>Speech Recognition</h1>
+  <button id="toggleButton">Toggle Microphone</button>
+  <div id="result"></div>
 
-    <script>
-        var recognition = new webkitSpeechRecognition();
-        recognition.continuous = true;
-        var isListening = false;
+  <script>
+    const toggleButton = document.getElementById('toggleButton');
+    const resultDiv = document.getElementById('result');
+    let isListening = false;
 
-        function startSpeech() {
-            if (!isListening) {
-                recognition.start();
-                document.getElementById('speechButton').classList.add('active');
-                isListening = true;
-            }
-        }
+    // Check if speech recognition is supported in the browser
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
 
-        function stopSpeech() {
-            if (isListening) {
-                recognition.stop();
-                document.getElementById('speechButton').classList.remove('active');
-                isListening = false;
-            }
-        }
+    // Configure the recognition settings
+    recognition.continuous = true;
+    recognition.interimResults = true;
 
-        function toggleSpeech() {
-            if (isListening) {
-                stopSpeech();
-            } else {
-                startSpeech();
-            }
+    toggleButton.addEventListener('click', () => {
+      if (!isListening) {
+        // Start listening when the button is clicked
+        recognition.start();
+        isListening = true;
+        toggleButton.textContent = 'Stop Microphone';
+      } else {
+        // Stop listening when the button is clicked again
+        recognition.stop();
+        isListening = false;
+        toggleButton.textContent = 'Start Microphone';
+      }
+    });
 
-            recognition.onresult = function(event) {
-                var transcript = event.results[event.results.length - 1][0].transcript;
-                document.getElementById('spokenText').innerText = transcript;
-                document.getElementById('speechInput').value = transcript;
-            };
-        }
+    recognition.onresult = (event) => {
+      const transcript = event.results[event.results.length - 1][0].transcript;
+      resultDiv.textContent = transcript;
 
-        recognition.onspeechend = function() {
-            stopSpeech();
-        };
+      // Extract values using regular expressions
+      const plateNumber = getMatch(transcript, /Plate number (\d+)/i);
+      const passengers = getMatch(transcript, /Passengers (\d+)/i);
+      const type = getMatch(transcript, /Type (.+)/i);
 
-        recognition.onerror = function(event) {
-            console.error('Speech recognition error:', event.error);
-            stopSpeech();
-        };
-    </script>
+      // Save the variables or do further processing
+      console.log('Plate number:', plateNumber);
+      console.log('Passengers:', passengers);
+      console.log('Type:', type);
+    };
+
+    function getMatch(input, regex) {
+      const match = input.match(regex);
+      return match ? match[1] : null;
+    }
+  </script>
 </body>
 </html>
