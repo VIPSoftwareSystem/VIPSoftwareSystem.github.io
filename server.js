@@ -27,10 +27,20 @@ app.post("/saveData", (req, res) => {
 
   const recordedDate = new Date().toISOString();
 
-  const sql = `INSERT INTO plates (LicensePlate, Passengers, Grade, plateType, notes, RecordedDate)
-                VALUES (?, ?, ?, ?, ?, ?)`;
+  console.log("Received data:");
+  console.log("LicensePlate:", LicensePlate);
+  console.log("Passengers:", Passengers);
+  console.log("Grade:", Grade);
+  console.log("plateType:", plateType);
+  console.log("notes:", notes);
+  console.log("recordedDate:", recordedDate);
 
-  connection.query(sql, [LicensePlate, Passengers, Grade, plateType, notes, recordedDate], (err, result) => {
+  const sql = `INSERT INTO plates (LicensePlate, Passengers, Grade, plateType, notes, RecordedDate)
+                VALUES ('${LicensePlate}', '${Passengers}', '${Grade}', '${plateType}', '${notes}', '${recordedDate}')`;
+
+  console.log("SQL query:", sql);
+
+  connection.query(sql, (err, result) => {
     if (err) {
       console.error("Error executing SQL query: ", err);
       res.status(500).json({ error: "Failed to save data" });
