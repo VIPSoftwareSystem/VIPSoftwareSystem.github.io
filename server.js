@@ -4,10 +4,11 @@ const port = 3000;
 
 const mysql = require("mysql");
 const connection = mysql.createConnection({
-  host: "127.0.0.1:3306",
+  host: "127.0.0.1",
+  port: 3306,
   user: "glasgowAdmin",
   password: "7&6H^OrifDxa6xlr",
-  database: "glasgow",
+  database: "glasgow"
 });
 
 connection.connect((err) => {
@@ -27,9 +28,9 @@ app.post("/saveData", (req, res) => {
   const recordedDate = new Date().toISOString();
 
   const sql = `INSERT INTO plates (LicensePlate, Passengers, Grade, plateType, notes, RecordedDate)
-                VALUES ('${LicensePlate}', '${Passengers}', '${Grade}', '${plateType}', '${notes}', '${recordedDate}')`;
+                VALUES (?, ?, ?, ?, ?, ?)`;
 
-  connection.query(sql, (err, result) => {
+  connection.query(sql, [LicensePlate, Passengers, Grade, plateType, notes, recordedDate], (err, result) => {
     if (err) {
       console.error("Error executing SQL query: ", err);
       res.status(500).json({ error: "Failed to save data" });

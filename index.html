@@ -3,10 +3,6 @@
 <head>
   <title>Speech Recognition</title>
   <style>
-    .body {
-
-    }
-
     #result {
       margin-top: 20px;
       width: 400px;
@@ -56,6 +52,33 @@
       console.log('Plate number:', plateNumber);
       console.log('Passengers:', passengers);
       console.log('Type:', type);
+
+      // Make a POST request to the server
+      const requestData = {
+        LicensePlate: plateNumber,
+        Passengers: passengers,
+        Grade: 'A',
+        plateType: type,
+        notes: ''
+      };
+
+      fetch('/saveData', {
+        method: 'POST',
+        body: JSON.stringify(requestData),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          console.log('Data saved successfully!');
+        } else {
+          console.error('Failed to save data');
+        }
+      })
+      .catch(error => {
+        console.error('An error occurred: ', error);
+      });
     };
 
     function getMatch(input, regex) {
