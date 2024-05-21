@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Speech Recognition</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .form-container {
+            display: none;
+            margin-top: 20px;
+        }
+        #speechButton {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        #speechButton.active {
+            background-color: #f44336;
+        }
+        #spokenText {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Speak Vehicle Information</h1>
+        <button id="speechButton" ontouchstart="startSpeech()" ontouchend="stopSpeech()" onclick="toggleSpeech()">Start Speaking</button>
+        <div id="spokenText"></div>
+        <div class="form-container">
+            <form id="speechForm" method="POST" action="/process_speech">
+                <input type="hidden" name="speechInput" id="speechInput">
+                <button type="submit">Save Information</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        var isListening = false;
+
+        function startSpeech() {
+            if (!isListening) {
+                recognition.start();
+                document.getElementById('speechButton').classList.add('active');
+                isListening = true;
+            }
+        }
+
+        function stopSpeech() {
+            if (isListening) {
+                recognition.stop();
+                document.getElementById('speechButton').classList.remove('active');
+                isListening = false;
+            }
+        }
+
+        function toggleSpeech() {
+            if (isListening) {
+                stopSpeech();
+            } else {
+                startSpeech();
+            }
+
+            recognition.onresult = function(event) {
+                var transcript = event.results[event.results.length - 1][0].transcript;
+                document.getElementById('spokenText').innerText = transcript;
+                document.getElementById('speechInput').value = transcript;
+            };
+        }
+
+        recognition.onspeechend = function() {
+            stopSpeech();
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+            stopSpeech();
+        };
+    </script>
+</body>
+</html>
