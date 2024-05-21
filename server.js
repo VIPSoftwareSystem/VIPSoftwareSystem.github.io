@@ -4,7 +4,7 @@ const port = 3000;
 
 const mysql = require("mysql");
 const connection = mysql.createConnection({
-  host: "127.0.0.1",
+  host: "localhost",
   port: 3306,
   user: "glasgowAdmin",
   password: "7&6H^OrifDxa6xlr",
@@ -23,24 +23,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.post("/saveData", (req, res) => {
-  const { LicensePlate, Passengers, Grade, plateType, notes } = req.body;
+  const { LicensePlate, Passengers, plateType } = req.body;
 
   const recordedDate = new Date().toISOString();
 
-  console.log("Received data:");
-  console.log("LicensePlate:", LicensePlate);
-  console.log("Passengers:", Passengers);
-  console.log("Grade:", Grade);
-  console.log("plateType:", plateType);
-  console.log("notes:", notes);
-  console.log("recordedDate:", recordedDate);
+  const sql = `INSERT INTO plates (LicensePlate, Passengers, Variant, IssuedDate, RecordedDate, Grade, plateType, notes)
+                VALUES (?, ?, '', '', ?, '', ?, '')`;
 
-  const sql = `INSERT INTO plates (LicensePlate, Passengers, Grade, plateType, notes, RecordedDate)
-                VALUES ('${LicensePlate}', '${Passengers}', '${Grade}', '${plateType}', '${notes}', '${recordedDate}')`;
-
-  console.log("SQL query:", sql);
-
-  connection.query(sql, (err, result) => {
+  connection.query(sql, [LicensePlate, Passengers, recordedDate, plateType], (err, result) => {
     if (err) {
       console.error("Error executing SQL query: ", err);
       res.status(500).json({ error: "Failed to save data" });
