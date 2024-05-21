@@ -54,27 +54,20 @@
       console.log('Passengers:', passengers);
       console.log('Type:', type);
 
-      // Send the data to the server for saving
-      fetch('/saveData', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          LicensePlate: plateNumber,
-          Passengers: passengers,
-          Grade: '',
-          plateType: type,
-          notes: ''
-        })
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to save data');
+      // Send the data to the PHP script
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'saveData.php', true);
+      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            console.log('Data saved successfully!');
+          } else {
+            console.error('Error saving data:', xhr.responseText);
+          }
         }
-        console.log('Data saved successfully!');
-      })
-      .catch(error => {
-        console.error('Error saving data:', error);
-      });
+      };
+      xhr.send(`LicensePlate=${plateNumber}&Passengers=${passengers}&Grade=&Type=${type}&notes=`);
     };
 
     function getMatch(input, regex) {

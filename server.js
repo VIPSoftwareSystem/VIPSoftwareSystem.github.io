@@ -1,46 +1,29 @@
-const express = require("express");
-const app = express();
-const port = 3000;
+<?php
+$dbhost = 'localhost';
+$dbuser = 'glasgowAdmin';
+$dbpass = '7&6H^OrifDxa6xlr';
+$dbname = 'glasgow';
 
-const mysql = require("mysql");
-const connection = mysql.createConnection({
-  host: "localhost",
-  port: 3306,
-  user: "glasgowAdmin",
-  password: "7&6H^OrifDxa6xlr",
-  database: "glasgow"
-});
+$licensePlate = $_POST['LicensePlate'];
+$passengers = $_POST['Passengers'];
+$grade = $_POST['Grade'];
+$plateType = $_POST['Type'];
+$notes = $_POST['notes'];
+$recordedDate = date('Y-m-d H:i:s');
 
-connection.connect((err) => {
-  if (err) {
-    console.error("Error connecting to the database: ", err);
-    return;
-  }
-  console.log("Connected to the database!");
-});
+$conn = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
+if ($conn->connect_error) {
+    die('Error connecting to the database: ' . $conn->connect_error);
+}
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+$sql = "INSERT INTO plates (LicensePlate, Passengers, Grade, plateType, notes, RecordedDate)
+        VALUES ('$licensePlate', '$passengers', '$grade', '$plateType', '$notes', '$recordedDate')";
 
-app.post("/saveData", (req, res) => {
-  const { LicensePlate, Passengers, plateType } = req.body;
+if ($conn->query($sql) === TRUE) {
+    echo 'Data saved successfully!';
+} else {
+    echo 'Error saving data: ' . $conn->error;
+}
 
-  const recordedDate = new Date().toISOString();
-
-  const sql = `INSERT INTO plates (LicensePlate, Passengers, Variant, IssuedDate, RecordedDate, Grade, plateType, notes)
-                VALUES (?, ?, '', '', ?, '', ?, '')`;
-
-  connection.query(sql, [LicensePlate, Passengers, recordedDate, plateType], (err, result) => {
-    if (err) {
-      console.error("Error executing SQL query: ", err);
-      res.status(500).json({ error: "Failed to save data" });
-      return;
-    }
-    console.log("Data saved successfully!");
-    res.sendStatus(200);
-  });
-});
-
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+$conn->close();
+?>
