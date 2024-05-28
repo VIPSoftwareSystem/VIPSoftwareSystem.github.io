@@ -3,7 +3,6 @@
 <head>
   <title>Speech Recognition</title>
   <style>
-
     #result {
       margin-top: 20px;
       width: 400px;
@@ -23,6 +22,9 @@
     const toggleButton = document.getElementById('toggleButton');
     const resultDiv = document.getElementById('result');
     let isListening = false;
+    let interimTranscript = '';
+    let finalTranscript = '';
+    let debounceTimer;
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
@@ -43,36 +45,98 @@
     });
 
     recognition.onresult = (event) => {
-      const transcript = event.results[event.results.length - 1][0].transcript;
-      resultDiv.textContent = transcript;
+      interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript + ' ';
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+      resultDiv.textContent = finalTranscript + interimTranscript;
 
-      const plateNumber = getMatch(transcript, /Plate number (\d+)/i);
-      const passengers = getMatch(transcript, /Passengers (\d+)/i);
-      const type = getMatch(transcript, /Type (.+)/i);
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        handleFinalTranscript(finalTranscript);
+        finalTranscript = '';
+      }, 5000); // 10 seconds debounce
+    };
+
+    function handleFinalTranscript(transcript) {
+      const normalizedTranscript = normalizeNumbers(transcript);
+      const plateNumber = getMatch(normalizedTranscript, /Plate number (\d+)/i);
+      const passengers = getMatch(normalizedTranscript, /Passengers (\d+)/i);
+      const type = getMatch(normalizedTranscript, /Type (.+)/i);
 
       console.log('Plate number:', plateNumber);
       console.log('Passengers:', passengers);
       console.log('Type:', type);
 
-      // Send the data to the PHP script
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', 'saveData.php', true);
-      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-          if (xhr.status === 200) {
-            console.log('Data saved successfully!');
-          } else {
-            console.error('Error saving data:', xhr.responseText);
-          }
+      // Check if transcript contains "Complete", "Finished", or "Submit"
+      if (/Complete|Finished|Submit/i.test(normalizedTranscript)) {
+        // Ensure all fields are filled
+        if (plateNumber && passengers && type) {
+          // Send the data to the PHP script
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', 'saveData.php', true);
+          xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+              if (xhr.status === 200) {
+                console.log('Data saved successfully!');
+              } else {
+                console.error('Error saving data:', xhr.responseText);
+              }
+            }
+          };
+          xhr.send(`LicensePlate=${plateNumber}&Passengers=${passengers}&Grade=&Type=${type}&notes=`);
+        } else {
+          console.error('Error: Missing data fields.');
         }
-      };
-      xhr.send(`LicensePlate=${plateNumber}&Passengers=${passengers}&Grade=&Type=${type}&notes=`);
-    };
+      }
+    }
 
     function getMatch(input, regex) {
       const match = input.match(regex);
       return match ? match[1] : null;
+    }
+
+    function normalizeNumbers(input) {
+      const numberWords = {
+        'zero': 0,
+        'one': 1,
+        'two': 2,
+        'three': 3,
+        'four': 4,
+        'five': 5,
+        'six': 6,
+        'seven': 7,
+        'eight': 8,
+        'nine': 9,
+        'ten': 10,
+        'eleven': 11,
+        'twelve': 12,
+        'thirteen': 13,
+        'fourteen': 14,
+        'fifteen': 15,
+        'sixteen': 16,
+        'seventeen': 17,
+        'eighteen': 18,
+        'nineteen': 19,
+        'twenty': 20,
+        'thirty': 30,
+        'forty': 40,
+        'fifty': 50,
+        'sixty': 60,
+        'seventy': 70,
+        'eighty': 80,
+        'ninety': 90,
+        'hundred': 100
+      };
+
+      const numberPattern = new RegExp('\\b(' + Object.keys(numberWords).join('|') + ')\\b', 'gi');
+
+      return input.replace(numberPattern, match => numberWords[match.toLowerCase()]);
     }
   </script>
 </body>
